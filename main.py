@@ -1,6 +1,7 @@
 import asyncio
 import json
 import time
+import random
 from colorama import init, Fore, Style
 from web3 import Web3
 import aiohttp
@@ -146,7 +147,7 @@ async def handle_eth_transactions(session, num_transactions):
                 print(f"{Fore.GREEN}Transaction {i + 1} sent from {short_from_address} with hash: {tx_hash.hex()}{Style.RESET_ALL}")
 
                 nonces[private_key] += 1
-                await asyncio.sleep(1)  
+                await asyncio.sleep(random.randint(5, 11))  # Random delay between 5 to 11 seconds
 
             except Exception as e:
                 if 'nonce too low' in str(e):
@@ -162,25 +163,17 @@ async def main(mode, num_transactions=None):
                 num_transactions = int(input(Fore.YELLOW + "Enter the number of transactions to be executed: " + Style.RESET_ALL))
             await handle_eth_transactions(session, num_transactions)
         elif mode == '2':
-            while True:  
-                for refresh_token in access_tokens:
-                    await handle_grow_and_garden(session, refresh_token)  
-                print(f"{Fore.RED}All accounts have been processed. Cooling down for 10 minutes...{Style.RESET_ALL}")
-                time.sleep(600)  
-        else:
-            print(Fore.RED + "Invalid option. Please choose either 1 or 2." + Style.RESET_ALL)
+            for token in access_tokens:
+                await handle_grow_and_garden(session, token)
+                await asyncio.sleep(5)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Choose the mode of operation.')
-    parser.add_argument('-a', '--action', choices=['1', '2'], help='1: Execute Transactions, 2: Grow and Garden')
-    parser.add_argument('-tx', '--transactions', type=int, help='Number of transactions to execute (optional for action 1)')
-
+    parser = argparse.ArgumentParser()
+    parser.add_argument('mode', choices=['1', '2'], help="Select mode: 1 = ETH deposit, 2 = Auto grow and open garden")
+    parser.add_argument('--num_transactions', type=int, help="Number of transactions for mode 1")
     args = parser.parse_args()
 
-    if args.action is None:
-        args.action = input(Fore.YELLOW + "Choose action (1: Execute Transactions, 2: Grow and Garden): " + Style.RESET_ALL)
-        while args.action not in ['1', '2']:
-            print(Fore.RED + "Invalid choice. Please select either 1 or 2." + Style.RESET_ALL)
-            args.action = input(Fore.YELLOW + "Choose action (1: Execute Transactions, 2: Grow and Garden): " + Style.RESET_ALL)
-   
-    asyncio.run(main(args.action, args.transactions))
+    try:
+        asyncio.run(main(args.mode, args.num_transactions))
+    except KeyboardInterrupt:
+        print(Fore.RED + "\nProcess interrupted by user. Exiting..." + Style.RESET_ALL)
