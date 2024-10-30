@@ -20,7 +20,7 @@ print(Fore.CYAN + Style.BRIGHT + """                t.me/zlkcyber *** github.com
 RPC_URL = "https://mainnet.base.org"
 CONTRACT_ADDRESS = "0xC5bf05cD32a14BFfb705Fb37a9d218895187376c"
 api_url = "https://hanafuda-backend-app-520478841386.us-central1.run.app/graphql"
-AMOUNT_ETH = 0.0000000001  # Amount of ETH to be deposited
+AMOUNT_ETH = 0.0000001  # Amount of ETH to be deposited
 web3 = Web3(Web3.HTTPProvider(RPC_URL))
 
 with open("pvkey.txt", "r") as file:
